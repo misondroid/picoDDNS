@@ -1,0 +1,92 @@
+services:
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: services/app/Dockerfile
+      args:
+        - USER_NAME=${USER_NAME:-app}
+        - USER_ID=${USER_ID:-1000}
+        - GROUP_NAME=${GROUP_NAME:-app}
+        - GROUP_ID=${GROUP_ID:-1000}
+      target: local
+    ports:
+      - 13000:3000
+    environment:
+      - APP_STAGE=dev
+      - STAGE=local
+      - NODE_ENV=development
+      - AWS_REGION=${AWS_REGION:-ap-northeast-1}
+      - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL:-http://floci:4566}
+      #- AWS_ENDPOINT_URL_DYNAMODB=${AWS_BACKEND_URL}
+      #- AWS_ENDPOINT_URL_SES=${AWS_BACKEND_URL}
+      #- AWS_ENDPOINT_URL_SESV2=${AWS_BACKEND_URL}
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN:-test}
+      - CLOUDFLARE_ACCOUNT_ID=${CLOUDFLARE_ACCOUNT_ID:-test}
+      - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL:-test}
+      - COGNITO_USER_POOL_ID=${COGNITO_USER_POOL_ID:-test}
+      - COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID:-test}
+      - COGNITO_CLIENT_SECRET=${COGNITO_CLIENT_SECRET} 
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-test@example.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-p@ssw0rd}
+      - APP_NAME=${APP_NAME:-myDDNS}
+    volumes:
+      - ./code/backend:/app
+      - ./code/infra:/infra
+      - ./code/infrastructure:/infra
+      - ~/.aws:/home/${USER_NAME}/.aws
+      #- ~/.aws:/home/${USER_NAME}/.aws
+    command: sls offline start --host 0.0.0.0 --httpPort 3000 --reloadHandler --stage local
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:latest
+    ports:
+      - 8001:8001
+    environment:
+      - AWS_REGION=ap-northeast-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - HOST=0.0.0.0
+      - PORT=8001
+      - DYNAMO_ENDPOINT=${AWS_ENDPOINT_URL}
+    volumes:
+      - ./services/dynamodb-admin/data:/app/data
+  floci:
+    container_name: floci
+    image: hectorvent/floci:${FLOCI_VERSION:-latest}
+    ports:
+      - ${AWS_BACKEND_PORT:-4566}:4566
+    environment:
+      - AWS_DEFAULT_REGION=ap-northeast-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - FLOCI_STORAGE_MODE=persistent
+    volumes:
+      - ./services/floci/data:/app/data
+    user: root
+  frontend:
+    build:
+      context: .
+      dockerfile: services/frontend/Dockerfile
+    ports:
+      - 13001:3000
+    environment:
+      - VITE_API_URL=http://localhost:13000/api
+      - VITE_APP_NAME=${APP_NAME:-myDDNS}
+    volumes:
+      - ./code/frontend:/app
+      - /app/node_modules  # ビルド時のnode_modulesを保持（ホストマウントで上書きしない）
+    command: npm run dev
+  infra:
+
+    build:
+      context: .
+      dockerfile: services/infra/Dockerfile
+      args:
+        - USER_NAME=${USER_NAME:-app}
+        - USER_ID=${USER_ID:-1000}
+        - GROUP_NAME=${GROUP_NAME:-app}
+        - GROUP_ID=${GROUP_ID:-1000}
+      target: local
+    volumes:
+      - ./code/infrastructure:/app
+    command: bash

@@ -1,0 +1,12 @@
+services:
+  app:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPOSITORY}:${IMAGE_TAG}
+    build:
+      context: .
+      dockerfile: services/app/Dockerfile
+      args:
+        - USER_NAME=${USER_NAME:-app}
+        - USER_ID=${USER_ID:-1000}
+        - GROUP_NAME=${GROUP_NAME:-app}
+        - GROUP_ID=${GROUP_ID:-1000}
+      target: deploy
