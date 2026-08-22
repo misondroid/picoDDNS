@@ -3,7 +3,7 @@ frameworkVersion: '4'
 
 provider:
   name: aws
-  runtime: python3.12
+  runtime: python3.14
   region: ${env:AWS_REGION, 'ap-northeast-1'}
   # env:STAGE を優先（serverless-offline で --stage が opt に渡らない場合の回避）
   stage: ${env:STAGE, opt:stage, 'dev'}
@@ -19,7 +19,7 @@ custom:
 
 functions:
   microDDNS:
-    handler: main.handler
+    handler: app.handler
     timeout: 10
     events:
       - httpApi:

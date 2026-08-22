@@ -213,3 +213,6 @@ memo.md
 
 .terraform
 terraform.tfstate
+
+#インフラ管理ディレクトリでのみdirenvの設定ファイルを保存する
+!code/infrastructure/.envrc

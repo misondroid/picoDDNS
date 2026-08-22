@@ -76,17 +76,3 @@ services:
       - ./code/frontend:/app
       - /app/node_modules  # ビルド時のnode_modulesを保持（ホストマウントで上書きしない）
     command: npm run dev
-  infra:
-
-    build:
-      context: .
-      dockerfile: services/infra/Dockerfile
-      args:
-        - USER_NAME=${USER_NAME:-app}
-        - USER_ID=${USER_ID:-1000}
-        - GROUP_NAME=${GROUP_NAME:-app}
-        - GROUP_ID=${GROUP_ID:-1000}
-      target: local
-    volumes:
-      - ./code/infrastructure:/app
-    command: bash

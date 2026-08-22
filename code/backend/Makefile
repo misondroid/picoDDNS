@@ -1,5 +1,6 @@
 POOL_NAME?=${APP_NAME}
 CLIENT_NAME?=${APP_NAME}-client
+BUILD_DIR?=/tmp/build/${APP_NAME}
 
 init_user_pool:
 	python -m app.scripts.initialize_user_pool --email ${ADMIN_EMAIL} --password ${ADMIN_PASSWORD} --user-pool ${POOL_NAME} --client-name ${CLIENT_NAME}
@@ -17,3 +18,13 @@ purge_tables:
 purge_user_pools:
 	python -m app.scripts.purge_user_pools
 .PHONY: purge_user_pools
+
+package:
+	mkdir -p ${BUILD_DIR}
+	pip install -r requirements.txt -t ${BUILD_DIR}
+	cp -r app ${BUILD_DIR}
+	cd ${BUILD_DIR} && zip -r ${APP_NAME}.zip .
+.PHONY: package
+
+
+
