@@ -29,7 +29,6 @@ ARG AWS_SECRET_ACCESS_KEY=test
 ARG AWS_REGION=ap-northeast-1
 ARG PIP_INSTALL_OPTIONS="--no-cache-dir --break-system-packages --pre"
 COPY ./code/backend/requirements.txt /tmp/
-
 RUN set -xe && apk add --no-cache $(cat /tmp/local/apk.txt) && \
     pip install ${PIP_INSTALL_OPTIONS} -r /tmp/requirements.txt && \
     rm -rf /tmp/requirements.txt

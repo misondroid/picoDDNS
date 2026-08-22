@@ -25,6 +25,7 @@ help:
 	@echo "  setup - Install dependencies"
 	@echo "  login - Login to the app container"
 	@echo "  cf-token-url - Open Cloudflare token creation page (Zone list + DNS edit)"
+	@echo "  dummy-credentials - Write dummy AWS credentials under services/app/aws"
 .PHONY: help
 
 up:
@@ -95,3 +96,17 @@ cf-token-url:
 	echo "Please open the URL above in your browser"
 .PHONY: cf-token-url
 
+dummy-credentials:
+	@echo "Setting dummy credentials for app container"
+	@mkdir -p services/app/aws
+	@printf '%s\n' \
+		'[default]' \
+		'aws_access_key_id = test' \
+		'aws_secret_access_key = test' \
+		> services/app/aws/credentials
+	@printf '%s\n' \
+		'[default]' \
+		'region = ap-northeast-1' \
+		> services/app/aws/config
+	@echo "Setting dummy credentials for app container...done"
+.PHONY: dummy-credentials
