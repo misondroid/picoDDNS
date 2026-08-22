@@ -30,6 +30,7 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL:-test@example.com}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-p@ssw0rd}
       - APP_NAME=${APP_NAME:-myDDNS}
+      - MANAGEMENT_BUCKET=${MANAGEMENT_BUCKET:-picoddns-infrastructure}
     volumes:
       - ./code/backend:/app
       - ./code/infra:/infra

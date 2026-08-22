@@ -212,6 +212,7 @@ node_modules/
 memo.md
 
 .terraform
+.terraform.lock.hcl
 terraform.tfstate
 
 #インフラ管理ディレクトリでのみdirenvの設定ファイルを保存する
