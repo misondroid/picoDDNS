@@ -36,8 +36,13 @@ services:
       - ./code/infra:/infra
       - ./code/infrastructure:/infra
       - ~/.aws:/home/${USER_NAME}/.aws
+      - ./services/app/data/cache:/home/${USER_NAME}/.cache
+      - ./services/app/data/config:/home/${USER_NAME}/.config
       #- ~/.aws:/home/${USER_NAME}/.aws
-    command: sls offline start --host 0.0.0.0 --httpPort 3000 --reloadHandler --stage local
+    user: ${USER_NAME}
+    command: >
+      sh -c "uv sync &&
+      uv run sls offline start --host 0.0.0.0 --httpPort 3000 --reloadHandler --stage local"
   dynamodb-admin:
     image: aaronshaf/dynamodb-admin:latest
     ports:

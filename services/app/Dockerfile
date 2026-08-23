@@ -28,10 +28,8 @@ ARG AWS_ACCESS_KEY_ID=test
 ARG AWS_SECRET_ACCESS_KEY=test
 ARG AWS_REGION=ap-northeast-1
 ARG PIP_INSTALL_OPTIONS="--no-cache-dir --break-system-packages --pre"
-COPY ./code/backend/requirements.txt /tmp/
 RUN set -xe && apk add --no-cache $(cat /tmp/local/apk.txt) && \
-    pip install ${PIP_INSTALL_OPTIONS} -r /tmp/requirements.txt && \
-    rm -rf /tmp/requirements.txt
+    pip install ${PIP_INSTALL_OPTIONS} -r /tmp/local/requirements.txt
 WORKDIR /app
 COPY --from=tofu /usr/local/bin/tofu /usr/local/bin/tofu
 COPY ./services/common/bashrc ${USER_HOME}/.bashrc
