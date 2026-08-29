@@ -3,9 +3,10 @@ CLIENT_NAME?=${APP_NAME}-client
 STAGE?=dev
 BUILD_DIR?=/tmp/build/${APP_NAME}/${STAGE}
 PYTHON_VERSION?=3.14
-BUILD_OPTIONS?=--only-binary=:all: --platform linux/amd64  
-BUILD_OPTIONS+=--implementation cp --python-version ${PYTHON_VERSION}
-
+BUILD_OPTIONS_PIP?=--only-binary=:all: --platform linux/amd64  
+BUILD_OPTIONS_PIP+=--implementation cp --python-version ${PYTHON_VERSION}
+BUILD_OPTIONS_UV?=--format requirements.txt -o ${BUILD_DIR}/requirements.txt
+BUILD_OPTIONS_UV+=--python ${PYTHON_VERSION}
 init_user_pool:
 	python -m app.scripts.initialize_user_pool --email ${ADMIN_EMAIL} --password ${ADMIN_PASSWORD} --user-pool ${POOL_NAME} --client-name ${CLIENT_NAME}
 .PHONY: init_user_pool
@@ -25,7 +26,10 @@ purge_user_pools:
 
 package:
 	mkdir -p ${BUILD_DIR}
-	pip install -r requirements.txt ${BUILD_OPTIONS} -t ${BUILD_DIR}
+	cp -r app ${BUILD_DIR}
+	cp pyproject.toml ${BUILD_DIR}
+	cd ${BUILD_DIR} && uv export ${BUILD_OPTIONS_UV}
+	pip install -r requirements.txt ${BUILD_OPTIONS_PIP} -t ${BUILD_DIR}
 	cp -r app ${BUILD_DIR}
 	cd ${BUILD_DIR} && zip -r ../${APP_NAME}_${STAGE}.zip .
 .PHONY: package
